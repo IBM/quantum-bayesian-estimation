@@ -14,7 +14,7 @@ https://arxiv.org/abs/2108.10686
 
 See the inline documentation:
 * [The main class](quantum_bayesian_estimation/spam_1q_model.py) `SPAM1QModel`, and also the other library files.
-* [An example](quantum_bayesian_estimation/SPAM-Device-Basic-1.py) that can be run on an IBM Quantum device. 
+* [An example](quantum_bayesian_estimation/examples/SPAM-Device-Basic-1.py) that can be run on an IBM Quantum device. 
 
 ## Notes
 
@@ -23,6 +23,5 @@ If you have any questions or issues you are welcome to contact the project maint
 For more information see:
 
 * [LICENSE](LICENSE)
-* [README](README.md)
 * [MAINTAINERS](MAINTAINERS.md)
 * [CHANGELOG](CHANGELOG.md)
