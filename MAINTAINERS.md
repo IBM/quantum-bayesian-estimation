@@ -1,3 +1,3 @@
 # MAINTAINERS
 
-Haggai Landa - haggai.landa@ibm.com
+Haggai Landa - haggai . landa "at" ibm . com (discard "at" and whitespaces)
