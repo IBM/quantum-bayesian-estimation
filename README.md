@@ -10,11 +10,13 @@ The theory and modelling supported by this code, together with results from esti
 
 https://arxiv.org/abs/2108.10686
 
+Experiments using this code can be run on quantum hardware (such as [IBM Quantum](https://quantum-computing.ibm.com/) devices accessible via the cloud) using [Qiskit](https://qiskit.org/), see also the [Qiskit repositories on github](https://github.com/Qiskit).
+
 ## Documentation
 
 See the inline documentation:
 * [The main class](quantum_bayesian_estimation/spam_1q_model.py) `SPAM1QModel`, and also the other library files.
-* [An example](examples/SPAM-Device-Basic-1.py) that can be run on an IBM Quantum device. 
+* [An example](examples/SPAM-Device-Basic-1.py) that can be easily run to get you started. 
 
 ## Notes
 
