@@ -18,21 +18,21 @@ from qiskit import pulse, IBMQ
 _n_params = 12
 
 
-def get_qubit_groups(s_provider: str, n_qubits: int):
+def get_qubit_groups(s_backend: str, n_qubits: int):
 	if n_qubits == 1:
 		qubit_group_1 = [0]
 		qubit_group_2 = []
 	elif n_qubits == 5:
-		if s_provider == 'ibmq_manila' or s_provider == 'ibmq_bogota' or s_provider == 'ibmq_santiago':
+		if s_backend == 'ibmq_manila' or s_backend == 'ibmq_bogota' or s_backend == 'ibmq_santiago':
 			# linear chain devices
 			qubit_group_1 = [0, 2, 4]
 			qubit_group_2 = [1, 3]
-		elif s_provider == 'ibmq_quito' or s_provider == 'ibmq_belem' or s_provider == 'ibmq_lima':
+		elif s_backend == 'ibmq_quito' or s_backend == 'ibmq_belem' or s_backend == 'ibmq_lima':
 			# T-shape devices
 			qubit_group_1 = [0, 2, 3]
 			qubit_group_2 = [1, 4]
 		else:  # dunno
-			raise Exception(f"The connectivity of the 5Q device {s_provider} should be explicitly"
+			raise Exception(f"The connectivity of the 5Q device {s_backend} should be explicitly"
 							" coded in the lines above.")
 	elif n_qubits == 7:
 		qubit_group_1 = [0, 2, 3, 4, 6]
@@ -50,17 +50,18 @@ def get_qubit_groups(s_provider: str, n_qubits: int):
 	return qubit_group_1, qubit_group_2
 
 
-def init_device(s_provider):
+def init_device(s_provider: str, s_backend: str):
 	print('Connecting to IBMQ account.\n')
 	IBMQ.load_account()
-	provider = IBMQ.get_provider(hub = 'ibm-q', group = 'open', project = 'main')
-	backend = provider.get_backend(s_provider)
+	p_words = s_provider.split('/')
+	provider = IBMQ.get_provider(hub = p_words[0], group = p_words[1], project = p_words[2])
+	backend = provider.get_backend(s_backend)
 	n_qubits = backend.configuration().n_qubits
 	return backend, n_qubits
 
 
-def process_qubit_groups(s_provider: str, n_groups: int, n_qubits: int, b_sequential: bool):
-	qubit_group_1, qubit_group_2 = get_qubit_groups(s_provider, n_qubits)
+def process_qubit_groups(s_backend: str, n_groups: int, n_qubits: int, b_sequential: bool):
+	qubit_group_1, qubit_group_2 = get_qubit_groups(s_backend, n_qubits)
 	if n_qubits != len(qubit_group_1) + len(qubit_group_2):
 		raise -1  # bug above
 	if n_groups == 1:
@@ -146,8 +147,8 @@ def plot_device_data(n_graphs, s_graphs, n_qubits, data_mean, data_vars, s_title
 		plt.savefig(s_output_path + s_title)
 
 
-def plot_device_pairs(n_graphs, s_graphs, n_qubits, data_mean, data_vars, job_dates, s_title_prefix, s_title,
-					  b_save_figures, fontsize, s_output_path, fig_data = None):
+def plot_device_pairs(n_graphs, s_graphs, n_qubits, data_mean, data_vars, job_dates, s_title_prefix,
+					  s_title, b_save_figures, fontsize, s_output_path, fig_data = None):
 	if fig_data is None:
 		fig_data = [[3, 2], [0, 1], [6, 7], [10, 11]]
 	for i_fig in range(len(fig_data)):

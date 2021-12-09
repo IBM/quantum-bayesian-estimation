@@ -20,13 +20,15 @@ from quantum_bayesian_estimation.spam_routines import *
 
 # Parameters that can be modified, if necessary
 # ----------------------------------------------------------------
-shots = 8 * 1024  # Leave at maximum
+shots = 16 * 1024  # The number of shots each schedule is measured
 load_job = ''  # Set to an integer to load a previous job by index, or to a string with a job id
-n_repeats = 2  # The effective shots of each gate will be n_repeats * shots. Put 4 for higher accuracy.
+n_repeats = 1  # The effective shots of each gate will be n_repeats * shots.
 b_save_results = True  # Whether to save the results to a file that can later be loaded.
 b_save_figures = True  # Whether to save the figures to a (.png) file.
 fontsize = 14
-s_provider = 'ibmq_armonk'  # ibmq_bogota ibmq_lima ibmq_quito ibmq_santiago
+s_provider = 'ibm-q/open/main'
+s_backend = 'ibmq_armonk'  # ibmq_bogota ibmq_lima ibmq_quito ibmq_santiago
+
 n_draws = int(20e6)  # Number of initial Bayesian draws (before applying constraints)
 x0amp = .1  # x_0, y_0 amplitude in prior below
 gates = SPAM1QModel.BAYESIAN_QPCM_GATES  # Quantum Preparation and Classical Measurements errors
@@ -46,8 +48,8 @@ b_sequential = False  # add each an estimation of each qubit separately (sequent
 
 # Start the the estimation
 plt.ioff()
-backend, n_qubits = init_device(s_provider)
-qubits, _, n_params = process_qubit_groups(s_provider, n_groups, n_qubits, b_sequential)
+backend, n_qubits = init_device(s_provider, s_backend)
+qubits, _, n_params = process_qubit_groups(s_backend, n_groups, n_qubits, b_sequential)
 winsound.Beep(1000, 250)
 ts0 = time.time()
 
@@ -86,7 +88,7 @@ for i_group, group in enumerate(qubits):
 
 if b_save_results:
 	spam_model.save_results(s_output_path + 'results', job_result, parameters, results, prior_intervals)
-s_title = s_provider + ', ' + job_id
+s_title = s_backend + ', ' + job_id
 plot_device_data(n_graphs, s_graphs, n_qubits, data_mean, data_vars, 'SPAM data, ' + s_title,
 				 b_save_figures, s_output_path)
 
