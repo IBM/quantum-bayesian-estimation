@@ -94,6 +94,15 @@ class SPAM1QModel(Bayesian1QModel):
 	BAYESIAN_QPCMG_PARAMETERS. May not be suitable for all devices, if their manifested errors
 	are too large."""
 
+	BAYESIAN_CPCMG_PARAMETERS = ['z_0', 'pi_z', 'pi_0', 'epsilon', 'theta']
+	"""The five parameters supported for estimation of Classical Preparation / Classical Measurement
+	and Gate errors."""
+
+	BAYESIAN_CPCMG_PRIORS = [[.82, 1.], [.4, .55], [.45, .6], [.0, .01], [-.01, .01]]
+	"""Seven default parameter priors for estimation corresponding to parameters defined in
+	BAYESIAN_CPCMG_PARAMETERS. May not be suitable for all devices, if their manifested errors
+	are too large."""
+
 	BAYESIAN_DIRECT_GATES = ['id', 'x', 'x90p', 'x90m', 'y90p', 'y90m']
 	"""The six nonconcatenated gates used for estimation using a Bayesian estimation, without
 	gate errors."""
@@ -273,7 +282,6 @@ class SPAM1QModel(Bayesian1QModel):
 				for i_repeat in range(self._n_repeats):
 					s_name = self._get_schedule_name(i_group, s_gate, i_gate, i_repeat)
 					with pulse.build(backend = self._backend, name = s_name,
-									 default_alignment = 'sequential',
 									 default_transpiler_settings = {'basis_gates': ['x']}) as sched:
 						for qubit in qubit_group:
 							if self._qubit_amp_factors is not None:
@@ -307,6 +315,7 @@ class SPAM1QModel(Bayesian1QModel):
 							else:
 								raise Exception(f"Unknown/unsupported instruction {s_gate}.")
 							sched = self._post_qubit_call(i_group, i_repeat, qubit, sched)
+							pulse.barrier(qubit)  # Critical for the measurement timing!
 						pulse.measure_all()
 					# sched += measure << sched.duration
 					schedules.append(sched)
