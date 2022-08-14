@@ -45,6 +45,9 @@ def get_qubit_groups(s_backend: str, n_qubits: int):
 						 41, 43, 45, 47, 49, 51, 55, 57, 59, 61, 63]
 		qubit_group_2 = [1, 3, 5, 7, 9, 10, 11, 12, 14, 16, 18, 20, 22, 24, 25, 26, 28, 30, 32, 34, 36, 38, 39,
 						 40, 42, 44, 46, 48, 50, 52, 53, 54, 56, 58, 60, 62, 64]
+	elif n_qubits == 127:
+		qubit_group_1 = list(range(n_qubits))
+		qubit_group_2 = []
 	else:
 		raise -1
 	return qubit_group_1, qubit_group_2
@@ -89,23 +92,31 @@ def process_qubit_groups(s_backend: str, n_groups: int, n_qubits: int, b_sequent
 
 def process_data(data_mean: np.ndarray, data_vars: np.ndarray, i_graph: int, qubit: int, spam_results: Dict):
 	mean_dict: Dict = spam_results['mean_dict']
-	data_mean[i_graph, qubit, 0:3] = np.asarray([mean_dict['x_0'], mean_dict['y_0'], mean_dict['z_0']])
+	data_mean[i_graph, qubit, 0:3] = np.asarray([
+		mean_dict.get('x_0', 0),
+		mean_dict.get('y_0', 0),
+		mean_dict.get('z_0', 0)])
 	pi_0 = mean_dict['pi_0']
 	pi_z = mean_dict['pi_z']
 	data_mean[i_graph, qubit, 6:9] = np.asarray([pi_z, pi_0, spam_results['Var_P']])
 	vars_dict = spam_results['vars_dict']
 	Vpi_0 = vars_dict['pi_0']
 	Vpi_z = vars_dict['pi_z']
-	data_vars[i_graph, qubit, 0:3] = np.asarray([vars_dict['x_0'], vars_dict['y_0'], vars_dict['z_0']])
+	data_vars[i_graph, qubit, 0:3] = np.asarray([
+		vars_dict.get('x_0', np.nan),
+		vars_dict.get('y_0', np.nan),
+		vars_dict.get('z_0', np.nan)])
 	data_vars[i_graph, qubit, 6:9] = np.asarray([Vpi_z, Vpi_0, 0.])
 
 	rho = np.linalg.norm(data_mean[i_graph, qubit, 0:2], 2)
 	r = np.linalg.norm(data_mean[i_graph, qubit, 0:3], 2)
 	data_mean[i_graph, qubit, 3] = rho
-	data_vars[i_graph, qubit, 3] = ((data_mean[i_graph, qubit, 0] / rho) ** 2) * data_vars[i_graph, qubit, 0] + \
-								   ((data_mean[i_graph, qubit, 1] / rho) ** 2) * data_vars[i_graph, qubit, 1]
+	if rho:
+		data_vars[i_graph, qubit, 3] = ((data_mean[i_graph, qubit, 0] / rho) ** 2) * data_vars[i_graph, qubit, 0] + \
+									   ((data_mean[i_graph, qubit, 1] / rho) ** 2) * data_vars[i_graph, qubit, 1]
 	data_mean[i_graph, qubit, 4] = r
-	data_mean[i_graph, qubit, 5] = np.arctan2(data_mean[i_graph, qubit, 1], data_mean[i_graph, qubit, 0])
+	if rho:
+		data_mean[i_graph, qubit, 5] = np.arctan2(data_mean[i_graph, qubit, 1], data_mean[i_graph, qubit, 0])
 	# Variance is not calculated for the above two.
 
 	data_mean[i_graph, qubit, 9] = 1 - (pi_0 + pi_z)
